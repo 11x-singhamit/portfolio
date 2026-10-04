@@ -1,0 +1,72 @@
+name: Deploy (vendor-independent static artifact)
+
+# This workflow builds the same vendor-independent dist/ as CI and publishes it
+# as a portable artifact. Attach provider-specific deploy steps ONLY as separate
+# jobs that consume the artifact — never inside the application build itself.
+#
+# Examples (uncomment and add secrets as needed):
+# - Cloudflare Pages: cloudflare/wrangler-action
+# - Vercel / Netlify: their CLI via GitHub Secrets
+# - GitHub Pages: actions/upload-pages-artifact + actions/deploy-pages
+#
+# By default this workflow only verifies the artifact is deployable.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-artifact:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Production build
+        run: npm run build
+
+      - name: Upload deployable static artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-dist
+          path: dist/
+          retention-days: 30
+
+  # Example: GitHub Pages deployment (optional, uncomment to enable).
+  # Requires Settings → Pages → Source: GitHub Actions.
+  #
+  # deploy-pages:
+  #   needs: build-artifact
+  #   runs-on: ubuntu-latest
+  #   permissions:
+  #     pages: write
+  #     id-token: write
+  #   environment:
+  #     name: github-pages
+  #     url: ${{ steps.deployment.outputs.page_url }}
+  #   steps:
+  #     - name: Download artifact
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         name: production-dist
+  #         path: dist
+  #     - name: Upload Pages artifact
+  #       uses: actions/upload-pages-artifact@v3
+  #       with:
+  #         path: dist
+  #     - name: Deploy to GitHub Pages
+  #       id: deployment
+  #       uses: actions/deploy-pages@v4

@@ -1,0 +1,12 @@
+# Optional example headers for hosts that support a _headers file (e.g. Netlify, Cloudflare Pages).
+# This file is NOT required by the application. Keep it isolated from the build;
+# copy/rename per your provider's docs if you use that provider.
+#
+# Netlify: place as `public/_headers` (see https://docs.netlify.com/routing/headers/)
+# Cloudflare Pages: use `_headers` at the output root (see Cloudflare docs)
+
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'
